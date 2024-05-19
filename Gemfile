@@ -2,9 +2,10 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in rexml-css-selector.gemspec
 gemspec
 
-gem "rake", "~> 13.0"
-
-gem "minitest", "~> 5.16"
+group :development do
+  gem "rake", "~> 13.0"
+  gem "minitest", "~> 5.16"
+  gem "minitest-reporters", "~> 1.6"
+end
