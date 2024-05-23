@@ -5,9 +5,9 @@ module REXML
     # Complex/compound/relative selectors:
 
     SelectorList = Data.define(:selectors)
-    ComplexSelector = Data.define(:current, :combinator, :next)
+    ComplexSelector = Data.define(:left, :combinator, :right)
     CompoundSelector = Data.define(:type, :subclasses, :pseudo_elements)
-    RelativeSelector = Data.define(:combinator, :next)
+    RelativeSelector = Data.define(:combinator, :right)
 
     # Type selectors:
 
@@ -18,7 +18,7 @@ module REXML
 
     Id = Data.define(:name)
     ClassName = Data.define(:name)
-    Attribute = Data.define(:namespace, :name, :operator, :value, :modifier)
+    Attribute = Data.define(:namespace, :name, :matcher, :value, :modifier)
     PseudoClass = Data.define(:name, :argument)
 
     Namespace = Data.define(:name)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'rexml/document'
-require 'strscan'
+require "rexml/document"
+require "strscan"
 
 module REXML
   class CSSSelector
@@ -10,6 +10,6 @@ module REXML
   end
 end
 
-require_relative 'css_selector/ast'
-require_relative 'css_selector/parser'
-require_relative 'css_selector/version'
+require_relative "css_selector/ast"
+require_relative "css_selector/parser"
+require_relative "css_selector/version"
