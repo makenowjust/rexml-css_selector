@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
 group :development do
-  gem "rake", "~> 13.0"
-  gem "minitest", "~> 5.16"
-  gem "minitest-reporters", "~> 1.6"
+  gem 'minitest', '~> 5.16'
+  gem 'minitest-reporters', '~> 1.6'
+  gem 'rake', '~> 13.0'
+  gem 'rubocop', '~> 1.63'
+  gem 'rubocop-minitest', '~> 0.35'
+  gem 'rubocop-rake', '~> 0.6'
 end

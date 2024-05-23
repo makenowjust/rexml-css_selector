@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module REXML
   class CSSSelector
     class ParseError < Error
@@ -7,33 +9,31 @@ module REXML
     end
 
     class Parser
-      DefaultConfig = {
+      DEFAULT_CONFIG = {
         pseudo_class_functions: {
-          "not" => :selector_list,
-          "is" => :selector_list,
-          "where" => :selector_list,
-          "has" => :relative_selector_list,
-          "nth-child" => :nth_of_selector_list,
-          "nth-last-child" => :nth_of_selector_list,
-          "nth-of-type" => :nth,
-          "nth-last-of-type" => :nth,
-          "host" => :selector_list,
-          "host-context" => :selector_list,
+          'not' => :selector_list,
+          'is' => :selector_list,
+          'where' => :selector_list,
+          'has' => :relative_selector_list,
+          'nth-child' => :nth_of_selector_list,
+          'nth-last-child' => :nth_of_selector_list,
+          'nth-of-type' => :nth,
+          'nth-last-of-type' => :nth,
+          'host' => :selector_list,
+          'host-context' => :selector_list
         },
-        pseudo_element_functions: {},
-      }
+        pseudo_element_functions: {}
+      }.freeze
 
       def initialize(source, config = {})
         @scanner = StringScanner.new(source)
-        @config = DefaultConfig.merge(config)
+        @config = DEFAULT_CONFIG.merge(config)
       end
 
       def parse
         @scanner.scan RE_WS
         parse_selector_list
       end
-
-      private
 
       # See https://www.w3.org/TR/css-syntax-3/#token-diagrams and https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions.
 
@@ -45,7 +45,10 @@ module REXML
       RE_IDENT_START = /[a-zA-Z_\P{ASCII}]|#{RE_ESCAPE}/
       RE_IDENT_PART = /(?:[-a-zA-Z0-9_\P{ASCII}]|#{RE_ESCAPE})*/
       RE_IDENT = /(?:-?(?:#{RE_IDENT_START})|--)(?:#{RE_IDENT_PART})*/
-      RE_STRING = /"(?:(?!#{RE_NEWLINE})[^"\\]|#{RE_ESCAPE_NEWLINE})*"|'(?:(?!#{RE_NEWLINE})[^'\\]|#{RE_ESCAPE_NEWLINE})*'/
+      RE_STRING = /
+        "(?:(?!#{RE_NEWLINE})[^"\\]|#{RE_ESCAPE_NEWLINE})*"
+      | '(?:(?!#{RE_NEWLINE})[^'\\]|#{RE_ESCAPE_NEWLINE})*'
+      /x
       RE_SUBSTITUTE = /\$#{RE_IDENT}/
       RE_VALUE = /#{RE_IDENT}|#{RE_STRING}|#{RE_SUBSTITUTE}/
 
@@ -62,10 +65,10 @@ module REXML
       end
 
       def self.unescape_value(value)
-        if value[0] == ?" || value[0] == ?'
+        if value[0] == '"' || value[0] == "'"
           value = value[1...-1].gsub(RE_ESCAPE_NEWLINE) do |escape|
             if escape[1] =~ /[\n\r\f]/
-              ""
+              ''
             elsif escape[1] =~ /\H/
               escape[1]
             else
@@ -73,7 +76,7 @@ module REXML
             end
           end
           String[value]
-        elsif value[0] == ?$
+        elsif value[0] == '$'
           Substitution[unescape_ident(value[1..])]
         else
           Ident[unescape_ident(value)]
@@ -83,12 +86,14 @@ module REXML
       def self.unescape_namespace(value)
         return nil unless value
 
-        if value == "*"
+        if value == '*'
           UniversalNamespace[]
         else
           Namespace[name: unescape_ident(value)]
         end
       end
+
+      private
 
       # See https://www.w3.org/TR/selectors-4/#grammar.
       #
@@ -132,9 +137,8 @@ module REXML
       def parse_selector_list
         selector_list = parse_complex_selector_list
         @scanner.scan RE_WS
-        unless @scanner.eos?
-          raise ParseError.new("expected end-of-string", @scanner.charpos)
-        end
+        raise ParseError.new('expected end-of-string', @scanner.charpos) unless @scanner.eos?
+
         selector_list
       end
 
@@ -159,7 +163,7 @@ module REXML
         last = parse_compound_selector
         pairs = []
 
-        while combinator = try_parse_combinator
+        while (combinator = try_parse_combinator)
           pairs << [last, combinator]
           last = parse_compound_selector
         end
@@ -182,14 +186,14 @@ module REXML
         return nil unless @scanner.scan(RE_COMBINATOR)
 
         case @scanner[0].strip
-        when ">" then return :child
-        when "~" then return :sibling
-        when "+" then return :adjacent
-        when "||" then return :column
-        when "" then return :descendant
+        when '>' then return :child
+        when '~' then return :sibling
+        when '+' then return :adjacent
+        when '||' then return :column
+        when '' then return :descendant
         end
 
-        raise "unreachable"
+        raise 'unreachable'
       end
 
       # ```
@@ -201,17 +205,17 @@ module REXML
         type = try_parse_type_selector
 
         subclasses = []
-        while subclass = try_parse_subclass_selector
+        while (subclass = try_parse_subclass_selector)
           subclasses << subclass
         end
 
         pseudo_elements = []
-        while pseudo_element = try_parse_pseudo_element_selector
+        while (pseudo_element = try_parse_pseudo_element_selector)
           pseudo_elements << pseudo_element
         end
 
         if type.nil? && subclasses.empty? && pseudo_elements.empty?
-          raise ParseError.new("expected type, subclass, or pseudo element selector", @scanner.charpos)
+          raise ParseError.new('expected type, subclass, or pseudo element selector', @scanner.charpos)
         end
 
         CompoundSelector[type:, subclasses:, pseudo_elements:]
@@ -232,9 +236,7 @@ module REXML
         namespace = Parser.unescape_namespace(@scanner[:namespace])
         tag_name = @scanner[:tag_name]
 
-        if tag_name == "*"
-          return UniversalType[namespace:]
-        end
+        return UniversalType[namespace:] if tag_name == '*'
 
         TagNameType[namespace:, tag_name: Parser.unescape_ident(tag_name)]
       end
@@ -251,7 +253,7 @@ module REXML
       # <attr-modifier> = i | s
       # ```
 
-      RE_SUBCLASS_SELECTOR = %r{
+      RE_SUBCLASS_SELECTOR = /
         \#(?<id>#{RE_IDENT})
       | \.(?<class>#{RE_IDENT})
       | \[
@@ -268,18 +270,14 @@ module REXML
             #{RE_WS}
           )?
         \]
-      }x
+      /x
 
       def try_parse_subclass_selector
         return try_parse_pseudo_class_selector unless @scanner.scan(RE_SUBCLASS_SELECTOR)
 
-        if @scanner[:id]
-          return Id[name: Parser.unescape_ident(@scanner[:id])]
-        end
+        return Id[name: Parser.unescape_ident(@scanner[:id])] if @scanner[:id]
 
-        if @scanner[:class]
-          return ClassName[name: Parser.unescape_ident(@scanner[:class])]
-        end
+        return ClassName[name: Parser.unescape_ident(@scanner[:class])] if @scanner[:class]
 
         namespace = Parser.unescape_namespace(@scanner[:attr_namespace])
         name = Parser.unescape_ident(@scanner[:attr_name])
@@ -292,7 +290,7 @@ module REXML
           operator = value = modifier = nil
         end
 
-        return Attribute[namespace:, name:, operator:, value:, modifier:]
+        Attribute[namespace:, name:, operator:, value:, modifier:]
       end
 
       # ```
@@ -312,9 +310,7 @@ module REXML
 
         name = Parser.unescape_ident(@scanner[:name])
 
-        if @scanner.scan(RE_OPEN_PAREN)
-          argument = parse_function_argument(@config[:pseudo_class_functions][name])
-        end
+        argument = parse_function_argument(@config[:pseudo_class_functions][name]) if @scanner.scan(RE_OPEN_PAREN)
 
         PseudoClass[name:, argument:]
       end
@@ -324,12 +320,10 @@ module REXML
 
         name = Parser.unescape_ident(@scanner[:name])
 
-        if @scanner.scan(RE_OPEN_PAREN)
-          argument = parse_function_argument(@config[:pseudo_element_functions][name])
-        end
+        argument = parse_function_argument(@config[:pseudo_element_functions][name]) if @scanner.scan(RE_OPEN_PAREN)
 
         pseudo_classes = []
-        while pseudo_class = try_parse_pseudo_class_selector
+        while (pseudo_class = try_parse_pseudo_class_selector)
           pseudo_classes << pseudo_class
         end
 
@@ -352,9 +346,7 @@ module REXML
           nth
         when :nth_of_selector_list
           nth = parse_nth
-          if @scanner.scan(RE_OF)
-            selector_list = parse_complex_selector_list
-          end
+          selector_list = parse_complex_selector_list if @scanner.scan(RE_OF)
           scan! RE_CLOSE_PAREN, '")"'
           NthOfSelectorList[nth:, selector_list:]
         else
@@ -371,20 +363,20 @@ module REXML
       def parse_nth
         scan! RE_NTH, '"odd", "even", or An+B'
         case @scanner[0]
-        when "odd"
+        when 'odd'
           Odd[]
-        when "even"
+        when 'even'
           Even[]
         else
           a =
             case @scanner[:a]
-            when "+" then 1
-            when "-" then -1
+            when '+' then 1
+            when '-' then -1
             else @scanner[:a].to_i
             end
           b =
             case @scanner[:b]
-            when "" then 0
+            when '' then 0
             else @scanner[:b].to_i
             end
           Nth[a:, b:]
@@ -413,17 +405,15 @@ module REXML
         list = []
         list << yield
 
-        while @scanner.scan(RE_COMMA)
-          list << yield
-        end
+        list << yield while @scanner.scan(RE_COMMA)
 
         list
       end
 
-      def scan!(re, error_token)
-        unless @scanner.scan(re)
-          raise ParseError.new("expected #{error_token}", @scanner.charpos)
-        end
+      def scan!(regexp, error_token)
+        return if @scanner.scan(regexp)
+
+        raise ParseError.new("expected #{error_token}", @scanner.charpos)
       end
     end
   end
