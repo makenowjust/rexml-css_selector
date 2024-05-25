@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module REXML
-  class CSSSelector
+  module CSSSelector
     class ParseError < Error
       def initialize(message, pos)
         super("#{message} (at #{pos})")
@@ -28,7 +28,11 @@ module REXML
 
       def initialize(source, config = {})
         @scanner = StringScanner.new(source)
-        @config = DEFAULT_CONFIG.merge(config)
+        @config = DEFAULT_CONFIG.dup
+        @config[:pseudo_class_functions] = @config[:pseudo_class_functions].merge(config[:pseudo_class_functions] || {})
+        @config[:pseudo_element_functions] = @config[:pseudo_element_functions].merge(
+          config[:pseudo_element_functions] || {}
+        )
       end
 
       def parse
@@ -181,7 +185,7 @@ module REXML
         RelativeSelector[combinator:, right: selector]
       end
 
-      RE_COMBINATOR = /#{RE_WS}(?:[>+~]|\|\|)#{RE_WS}|(?:#{RE_WHITESPACE})+/
+      RE_COMBINATOR = /#{RE_WS}(?:[>+~]|\|\|)#{RE_WS}|(?:#{RE_WHITESPACE})+(?![,)])/
 
       def try_parse_combinator
         return nil unless @scanner.scan(RE_COMBINATOR)

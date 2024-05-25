@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module REXML
-  class CSSSelector
+  module CSSSelector
     # Complex/compound/relative selectors:
 
     SelectorList = Data.define(:selectors)

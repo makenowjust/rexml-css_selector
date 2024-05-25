@@ -9,7 +9,13 @@ AllCops:
   TargetRubyVersion: 3.1
   NewCops: enable
 
+Lint/DuplicateBranch:
+  Enabled: false
+
 Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+Lint/UnreachableLoop:
   Enabled: false
 
 Metrics/AbcSize:
@@ -22,4 +28,13 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/MethodParameterName:
   Enabled: false

@@ -3,7 +3,7 @@
 require "test_helper"
 
 module REXML
-  class CSSSelector
+  module CSSSelector
     class TestParser < Minitest::Test
       def assert_parse(source, expected)
         parser = Parser.new(source)

@@ -1,5 +1,5 @@
 module REXML
-  class CSSSelector
+  module CSSSelector
     VERSION: String
   end
 end
