@@ -13,13 +13,13 @@ Gem::Specification.new do |spec|
     This library is a REXML extension for supporting CSS query selector.
     It provides both a CSS query selector parser and a matcher.
   DESCRIPTION
-  spec.homepage = "https://github.com/makenowjust/rexml-css-selector/"
+  spec.homepage = "https://github.com/makenowjust/rexml-css_selector/"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/makenowjust/rexml-css-selector.git"
-  spec.metadata["changelog_uri"] = "https://github.com/makenowjust/rexml-css-selector/blob/releases/"
+  spec.metadata["source_code_uri"] = "https://github.com/makenowjust/rexml-css_selector.git"
+  spec.metadata["changelog_uri"] = "https://github.com/makenowjust/rexml-css_selector/blob/releases/"
 
   spec.files =
     Dir.chdir(__dir__) do
