@@ -3,7 +3,7 @@
 module REXML
   module CSSSelector
     class PseudoClassDef
-      def initialize(argument_kind: nil, &compile)
+      def initialize(argument_kind = nil, &compile)
         @argument_kind = argument_kind
         @compile = compile
       end

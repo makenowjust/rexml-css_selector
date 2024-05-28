@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency("rexml", ">= 3.2.8")
+  spec.add_runtime_dependency("set", ">= 1.0.3")
   spec.add_runtime_dependency("strscan", ">= 3.1.0")
   spec.metadata["rubygems_mfa_required"] = "true"
 end

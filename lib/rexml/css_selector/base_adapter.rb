@@ -3,13 +3,16 @@
 module REXML
   module CSSSelector
     class BaseAdapter
-      def document?(_node)
-        false
+      def root?(element)
+        get_parent_node(element) == get_document_node(element)
       end
 
-      def root?(element)
-        parent = get_parent_node(element)
-        parent.nil? || document?(parent)
+      def checked?(element)
+        !!get_attribute(element, "checked")
+      end
+
+      def disabled?(element)
+        !!get_attribute(element, "disabled")
       end
 
       def get_element_index(parent, element)

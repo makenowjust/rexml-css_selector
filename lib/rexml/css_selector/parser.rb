@@ -9,35 +9,19 @@ module REXML
     end
 
     class Parser
-      DEFAULT_CONFIG = {
-        pseudo_class_functions: {
-          "not" => :selector_list,
-          "is" => :selector_list,
-          "where" => :selector_list,
-          "has" => :relative_selector_list,
-          "nth-child" => :nth_of_selector_list,
-          "nth-last-child" => :nth_of_selector_list,
-          "nth-of-type" => :nth,
-          "nth-last-of-type" => :nth,
-          "host" => :selector_list,
-          "host-context" => :selector_list
-        },
-        pseudo_element_functions: {
-        }
-      }.freeze
-
-      def initialize(source, config = {})
-        @scanner = StringScanner.new(source)
-        @config = DEFAULT_CONFIG.dup
-        @config[:pseudo_class_functions] = @config[:pseudo_class_functions].merge(config[:pseudo_class_functions] || {})
-        @config[:pseudo_element_functions] = @config[:pseudo_element_functions].merge(
-          config[:pseudo_element_functions] || {}
-        )
+      def initialize(**config)
+        @config = config
+        @config[:pseudo_classes] ||= {}
+        @config[:pseudo_elements] ||= {}
       end
 
-      def parse
+      def parse(source)
+        old_scanner = @scanner
+        @scanner = StringScanner.new(source)
         @scanner.scan RE_WS
         parse_selector_list
+      ensure
+        @scanner = old_scanner
       end
 
       # See https://www.w3.org/TR/css-syntax-3/#token-diagrams and https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions.
@@ -321,7 +305,9 @@ module REXML
 
         name = Parser.unescape_ident(@scanner[:name])
 
-        argument = parse_function_argument(@config[:pseudo_class_functions][name]) if @scanner.scan(RE_OPEN_PAREN)
+        if @scanner.scan(RE_OPEN_PAREN)
+          argument = parse_function_argument(@config[:pseudo_classes][name]&.argument_kind)
+        end
 
         PseudoClass[name:, argument:]
       end
@@ -331,7 +317,9 @@ module REXML
 
         name = Parser.unescape_ident(@scanner[:name])
 
-        argument = parse_function_argument(@config[:pseudo_element_functions][name]) if @scanner.scan(RE_OPEN_PAREN)
+        if @scanner.scan(RE_OPEN_PAREN)
+          argument = parse_function_argument(@config[:pseudo_elements][name]&.argument_kind)
+        end
 
         pseudo_classes = []
         while (pseudo_class = try_parse_pseudo_class_selector)

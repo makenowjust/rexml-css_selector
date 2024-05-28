@@ -3,6 +3,7 @@ PATH
   specs:
     rexml-css_selector (0.1.0)
       rexml (>= 3.2.8)
+      set (>= 1.0.3)
       strscan (>= 3.1.0)
 
 GEM
@@ -49,6 +50,7 @@ GEM
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     ruby-progressbar (1.13.0)
+    set (1.1.0)
     strscan (3.1.0)
     syntax_tree (6.2.0)
       prettier_print (>= 1.2.0)

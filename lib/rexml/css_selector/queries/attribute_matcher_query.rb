@@ -27,10 +27,12 @@ module REXML
             end
           return false unless value
 
-          actual = context.adapter.get_attribute(node, @name, @namespace)
+          name = @name
+          name = @name.downcase(:ascii) if context.options[:attribute_name_case] == :insensitive
+          actual = context.adapter.get_attribute(node, name, @namespace, context.options[:attribute_name_case])
           return false unless actual
 
-          if @modifier == :i
+          if @modifier == :i || context.options[:case_sensitive_attribute_values].include?(name)
             value = value.downcase(:ascii)
             actual = actual.downcase(:ascii)
           end
@@ -41,7 +43,7 @@ module REXML
           in :"~="
             actual.split(/\s+/).include?(value) && @cont.call(node, context)
           in :"|="
-            /(?:^|\|)#{value}(?:$|\||-)/.match?(actual) && @cont.call(node, context)
+            /(?:^|\|)#{value}(?:$|[|-])/.match?(actual) && @cont.call(node, context)
           in :"^="
             actual.start_with?(value) && @cont.call(node, context)
           in :"$="

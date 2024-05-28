@@ -5,7 +5,7 @@ module REXML
     class CompileError < Error
     end
 
-    class Compiler
+    class PseudoClassDef
       FIRST_CHILD =
         PseudoClassDef.new do |cont, pseudo_class, _compiler|
           raise CompileError, ":first-child must not take an argument" if pseudo_class.argument
@@ -25,7 +25,7 @@ module REXML
         end
 
       NTH_CHILD =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:nth_of_selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":nth-child must take an argument" unless pseudo_class.argument
           case pseudo_class.argument
           in NthOfSelectorList[nth:, selector_list: nil]
@@ -42,7 +42,7 @@ module REXML
         end
 
       NTH_LAST_CHILD =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:nth_of_selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":nth-last-child must take an argument" unless pseudo_class.argument
           case pseudo_class.argument
           in NthOfSelectorList[nth:, selector_list: nil]
@@ -77,14 +77,14 @@ module REXML
         end
 
       NTH_OF_TYPE =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:nth) do |cont, pseudo_class, compiler|
           raise CompileError, ":nth-of-type must take an argument" unless pseudo_class.argument
           a, b = compiler.nth_value(pseudo_class.argument)
           Queries::NthOfTypeQuery.new(cont:, a:, b:)
         end
 
       NTH_LAST_OF_TYPE =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:nth) do |cont, pseudo_class, compiler|
           raise CompileError, ":nth-last-of-type must take an argument" unless pseudo_class.argument
           a, b = compiler.nth_value(pseudo_class.argument)
           Queries::NthLastOfTypeQuery.new(cont:, a:, b:)
@@ -97,7 +97,7 @@ module REXML
         end
 
       IS =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":is must take an argument" unless pseudo_class.argument
           selector_list = pseudo_class.argument
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
@@ -108,7 +108,7 @@ module REXML
         end
 
       WHERE =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":where must take an argument" unless pseudo_class.argument
           selector_list = pseudo_class.argument
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
@@ -119,7 +119,7 @@ module REXML
         end
 
       NOT =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":not must take an argument" unless pseudo_class.argument
           selector_list = pseudo_class.argument
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
@@ -136,7 +136,7 @@ module REXML
         end
 
       HAS =
-        PseudoClassDef.new do |cont, pseudo_class, compiler|
+        PseudoClassDef.new(:relative_selector_list) do |cont, pseudo_class, compiler|
           raise CompileError, ":has must take an argument" unless pseudo_class.argument
           relative_selector_list = pseudo_class.argument
           needs_parent = false
@@ -158,30 +158,29 @@ module REXML
           Queries::HasQuery.new(cont:, query:, needs_parent:)
         end
 
-      DEFAULT_CONFIG = {
-        pseudo_classes: {
-          "first-child" => FIRST_CHILD,
-          "last-child" => LAST_CHILD,
-          "only-child" => ONLY_CHILD,
-          "nth-child" => NTH_CHILD,
-          "nth-last-child" => NTH_LAST_CHILD,
-          "first-of-type" => FIRST_OF_TYPE,
-          "last-of-type" => LAST_OF_TYPE,
-          "only-of-type" => ONLY_OF_TYPE,
-          "nth-of-type" => NTH_OF_TYPE,
-          "nth-last-of-type" => NTH_LAST_OF_TYPE,
-          "root" => ROOT,
-          "is" => IS,
-          "where" => WHERE,
-          "not" => NOT,
-          "scope" => SCOPE,
-          "has" => HAS
-        }
-      }.freeze
+      EMPTY =
+        PseudoClassDef.new do |cont, pseudo_class, _compiler|
+          raise CompileError, ":empty must not take an argument" if pseudo_class.argument
+          Queries::EmptyQuery.new(cont:)
+        end
 
-      def initialize(config = {})
-        @config = DEFAULT_CONFIG.dup
-        @config[:pseudo_classes] = @config[:pseudo_classes].merge(config[:pseudo_classes])
+      CHECKED =
+        PseudoClassDef.new do |cont, pseudo_class, _compiler|
+          raise CompileError, ":checked must not take an argument" if pseudo_class.argument
+          Queries::CheckedQuery.new(cont:)
+        end
+
+      DISABLED =
+        PseudoClassDef.new do |cont, pseudo_class, _compiler|
+          raise CompileError, ":disabled must not take an argument" if pseudo_class.argument
+          Queries::DisabledQuery.new(cont:)
+        end
+    end
+
+    class Compiler
+      def initialize(**config)
+        @config = config
+        @config[:pseudo_classes] ||= {}
       end
 
       def compile(selector_list) = compile_selector_list(selector_list)

@@ -9,6 +9,8 @@ require "test_helper"
 module REXML
   module CSSSelector
     class TestQwery < Minitest::Test
+      include Fixture::Helper
+
       def setup
         @document = Fixture.load_qwery
         @small_document = REXML::Document.new(<<~HTML)
@@ -36,14 +38,6 @@ module REXML
             </p>
           </root>
           HTML
-      end
-
-      def select(selector, scope = @document, **args)
-        CSSSelector.select(scope, selector, **args)
-      end
-
-      def select_all(selector, scope = @document, **args)
-        CSSSelector.select_all(scope, selector, **args)
       end
 
       # Small document:

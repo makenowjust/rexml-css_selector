@@ -11,7 +11,8 @@ module REXML
         end
 
         def call(node, context)
-          context.adapter.get_attribute(node, @name) && @cont.call(node, context)
+          context.adapter.get_attribute(node, @name, @namespace, context.options[:attribute_name_case]) &&
+            @cont.call(node, context)
         end
       end
     end

@@ -17,7 +17,7 @@ module REXML
 
           tag_name = context.adapter.get_tag_name(node)
           case context.options[:tag_name_case]
-          in nil | :sensitive
+          in :sensitive
             tag_name == @tag_name && @cont.call(node, context)
           in :insensitive
             tag_name = tag_name.downcase(:ascii)

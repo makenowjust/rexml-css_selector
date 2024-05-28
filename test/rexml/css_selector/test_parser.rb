@@ -6,15 +6,15 @@ module REXML
   module CSSSelector
     class TestParser < Minitest::Test
       def assert_parse(source, expected)
-        parser = Parser.new(source)
-        actual = parser.parse
+        parser = Parser.new(pseudo_classes: DEFAULT_CONFIG[:pseudo_classes])
+        actual = parser.parse(source)
 
         assert_equal expected, actual
       end
 
       def assert_parse_compound(source, type: nil, subclasses: [], pseudo_elements: [])
-        parser = Parser.new(source)
-        actual = parser.parse
+        parser = Parser.new(pseudo_classes: DEFAULT_CONFIG[:pseudo_classes])
+        actual = parser.parse(source)
 
         assert_equal SelectorList[selectors: [CompoundSelector[type:, subclasses:, pseudo_elements:]]], actual
       end

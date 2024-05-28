@@ -4,12 +4,25 @@ module REXML
   module CSSSelector
     module Adapters
       class REXMLAdapter < BaseAdapter
-        def document?(node)
-          node.is_a?(::REXML::Document)
+        def element?(node)
+          node.instance_of?(::REXML::Element)
         end
 
-        def element?(node)
-          node.is_a?(::REXML::Element)
+        def get_document_node(node)
+          node.root_node
+        end
+
+        def empty?(node)
+          node.children.all? do |child|
+            case child
+            when ::REXML::Element
+              false
+            when ::REXML::Text
+              child.to_s.match?(/\A\s*\z/)
+            else
+              true
+            end
+          end
         end
 
         def get_tag_name(element)
@@ -20,12 +33,23 @@ module REXML
           element.prefix
         end
 
-        def get_attribute(element, name, namespace = nil)
-          if namespace
-            namespace = element.namespace(namespace)
-            return nil unless namespace
+        def get_attribute(element, name, namespace = nil, attribute_name_case = :sensitive)
+          namespace = element.namespace(namespace) if namespace
+
+          case attribute_name_case
+          in :sensitive
+            element.attribute(name, namespace)&.value
+          in :insensitive
+            name = name.downcase(:ascii)
+            target_attr = nil
+            element.attributes.each_attribute do |attr|
+              if attr.name.downcase(:ascii) == name && (!namespace || attr.namespace == namespace)
+                target_attr = attr
+                break
+              end
+            end
+            target_attr&.value
           end
-          element.attribute(name, namespace)&.value
         end
 
         def get_parent_node(element)

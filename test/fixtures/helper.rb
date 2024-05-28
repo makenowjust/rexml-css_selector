@@ -7,4 +7,25 @@ module Fixture
 
   def self.load_sizzle = load("sizzle.html")
   def self.load_sizzle_xml = load("fries.xml")
+
+  module Helper
+    def select(selector, scope = @document, **config)
+      REXML::CSSSelector.select(scope, selector, **config)
+    end
+
+    def select_all(selector, scope = @document, **config)
+      REXML::CSSSelector.select_all(scope, selector, **config)
+    end
+
+    def id(id, document: @document)
+      ids(id, document:).first
+    end
+
+    def ids(*ids, document: @document)
+      condition = ids.map { |id| "@id=\"#{id}\"" }.join(" or ")
+      elements = []
+      document.each_element("//*[#{condition}]") { |element| elements << element }
+      elements
+    end
+  end
 end
