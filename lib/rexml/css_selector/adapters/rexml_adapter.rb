@@ -1,15 +1,12 @@
 # frozen_string_literal: true
 
-module REXML
+module REXML # :nodoc:
   module CSSSelector
     module Adapters
+      # REXMLAdapter is an adapter implementation for +REXML+.
       class REXMLAdapter < BaseAdapter
         def element?(node)
           node.instance_of?(::REXML::Element)
-        end
-
-        def get_document_node(node)
-          node.root_node
         end
 
         def empty?(node)
@@ -52,6 +49,10 @@ module REXML
           end
         end
 
+        def get_document_node(node)
+          node.root_node
+        end
+
         def get_parent_node(element)
           element.parent
         end
@@ -60,18 +61,15 @@ module REXML
           element.previous_element
         end
 
-        def get_children_elements(element)
-          element.children.filter { element?(_1) }
+        def each_child_element(element, &)
+          element.each_child { yield _1 if element?(_1) }
         end
 
-        def each_child_node(element, &)
-          element.each_child(&)
-        end
-
-        def each_recursive_node(element, &)
+        def each_recursive_element(element, &)
           element.each_recursive(&)
         end
 
+        # INSTANCE is the default instance.
         INSTANCE = new
       end
     end

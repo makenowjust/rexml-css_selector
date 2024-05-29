@@ -1,14 +1,59 @@
 # `REXML::CSSSelector`
 
-> A REXML extension for supporting CSS query selector.
+> A REXML extension for supporting CSS selector.
 
 ## Installation
 
-TODO: Write installation instructions here
+This library has not been published on RubyGems yet.
+
+You can use this library via GitHub source.
+Please add the following line to your `Gemfile`.
+
+```ruby
+gem 'rexml-css_selector', :git => 'git://github.com/makenowjust/rexml-css_selector.git'
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+The main API of this library is `REXML::CSSSelector.each_select`.
+`REXML::CSSSelector.each_select(scope, selector)` takes two arguments: `scope` is a scope node which it starts matching from, and `selector` is a CSS selector string.
+Then, it calls the given block with a matched node.
+
+See the example.
+
+```ruby
+require "rexml/document"
+require "rexml/css_selector"
+
+# From https://www.w3schools.com/xml/note.xml.
+doc = REXML::Document.new(<<~XML)
+  <?xml version="1.0" encoding="UTF-8"?>
+  <note>
+    <script/>
+    <to>Tove</to>
+    <from>Jani</from>
+    <heading>Reminder</heading>
+    <body>Don't forget me this weekend!</body>
+  </note>
+  XML
+
+# "script ~ *" selects sibling elements after a `<script>` tag.
+REXML::CSSSelector.each_select(doc, "script ~ *") do |element|
+  p element
+end
+
+# Output:
+# <to> ... </>
+# <from> ... </>
+# <heading> ... </>
+# <body> ... </>
+```
+
+This library also provides the following APIs:
+
+- `REXML::CSSSelector.select(scope, selector)`: Returns the first matched element.
+- `REXML::CSSSelector.select_all(scope, selector)`: Returns an array of matched elements.
+- `REXML::CSSSelector.is(node, selector, scope: node.document)`: Checks whether `node` matches `selector` from `scope`.
 
 ## Development
 

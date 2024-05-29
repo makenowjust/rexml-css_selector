@@ -2,6 +2,7 @@
 
 module REXML
   module CSSSelector
+    # PseudoClassDef is a definition of a pseudo class.
     class PseudoClassDef
       def initialize(argument_kind = nil, &compile)
         @argument_kind = argument_kind

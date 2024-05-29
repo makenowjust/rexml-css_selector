@@ -2,10 +2,11 @@
 
 module REXML
   module CSSSelector
+    # CompileError is an error on compilation.
     class CompileError < Error
     end
 
-    class PseudoClassDef
+    class PseudoClassDef # :nodoc:
       FIRST_CHILD =
         PseudoClassDef.new do |cont, pseudo_class, _compiler|
           raise CompileError, ":first-child must not take an argument" if pseudo_class.argument
@@ -36,7 +37,7 @@ module REXML
               raise CompileError, ":nth-child agument must not take a complex selector"
             end
             a, b = compiler.nth_value(nth)
-            query = compiler.compile_selector_list(selector_list)
+            query = compiler.compile(selector_list)
             Queries::NthChildOfQuery.new(cont:, a:, b:, query:)
           end
         end
@@ -53,7 +54,7 @@ module REXML
               raise CompileError, ":nth-last-child agument must not take a complex selector"
             end
             a, b = compiler.nth_value(nth)
-            query = compiler.compile_selector_list(selector_list)
+            query = compiler.compile(selector_list)
             Queries::NthLastChildOfQuery.new(cont:, a:, b:, query:)
           end
         end
@@ -103,7 +104,7 @@ module REXML
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
             raise CompileError, ":is agument must not take a complex selector"
           end
-          query = compiler.compile_selector_list(selector_list)
+          query = compiler.compile(selector_list)
           Queries::NestedQuery.new(cont:, query:)
         end
 
@@ -114,7 +115,7 @@ module REXML
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
             raise CompileError, ":where agument must not take a complex selector"
           end
-          query = compiler.compile_selector_list(selector_list)
+          query = compiler.compile(selector_list)
           Queries::NestedQuery.new(cont:, query:)
         end
 
@@ -125,7 +126,7 @@ module REXML
           if selector_list.selectors.any? { _1.is_a?(ComplexSelector) }
             raise CompileError, ":not agument must not take a complex selector"
           end
-          query = compiler.compile_selector_list(selector_list)
+          query = compiler.compile(selector_list)
           Queries::NotQuery.new(cont:, query:)
         end
 
@@ -154,7 +155,7 @@ module REXML
               end
               ComplexSelector[left: scope, combinator: relative_selector.combinator, right: relative_selector.right]
             end
-          query = compiler.compile_selector_list(SelectorList[selectors:])
+          query = compiler.compile(SelectorList[selectors:])
           Queries::HasQuery.new(cont:, query:, needs_parent:)
         end
 
@@ -177,13 +178,38 @@ module REXML
         end
     end
 
+    # Compiler is a compiler from selectors to queries.
     class Compiler
       def initialize(**config)
         @config = config
         @config[:pseudo_classes] ||= {}
       end
 
-      def compile(selector_list) = compile_selector_list(selector_list)
+      def compile(selector_list)
+        compile_selector_list(selector_list)
+      end
+
+      def namespace_name(namespace)
+        case namespace
+        in Namespace[name:]
+          name
+        in UniversalNamespace[] | nil
+          nil
+        end
+      end
+
+      def nth_value(nth)
+        case nth
+        in Nth[a:, b:]
+          [a, b]
+        in Odd[]
+          [2, 1]
+        in Even[]
+          [2, 0]
+        end
+      end
+
+      private
 
       def compile_selector_list(selector_list)
         queries = selector_list.selectors.map { compile_complex_selector(_1) }
@@ -254,26 +280,6 @@ module REXML
           Queries::ChildQuery.new(cont:)
         in :column
           raise CompileError, "column combinator is not supported"
-        end
-      end
-
-      def namespace_name(namespace)
-        case namespace
-        in Namespace[name:]
-          name
-        in UniversalNamespace[] | nil
-          nil
-        end
-      end
-
-      def nth_value(nth)
-        case nth
-        in Nth[a:, b:]
-          [a, b]
-        in Odd[]
-          [2, 1]
-        in Even[]
-          [2, 0]
         end
       end
     end

@@ -2,6 +2,7 @@
 
 module REXML
   module CSSSelector
+    # QueryContext is a context on matching CSS selector.
     class QueryContext
       def initialize(scope:, substitutions:, adapter:, options:)
         @scope = scope

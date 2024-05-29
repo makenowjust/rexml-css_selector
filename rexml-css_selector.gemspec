@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.authors = ["Hiroya Fujinami"]
   spec.email = ["make.just.on@gmail.com"]
 
-  spec.summary = "A REXML extension for supporting CSS query selector."
+  spec.summary = "A REXML extension for supporting CSS selector."
   spec.description = <<~DESCRIPTION
-    This library is a REXML extension for supporting CSS query selector.
-    It provides both a CSS query selector parser and a matcher.
+    This library is a REXML extension for supporting CSS selector.
+    It provides CSS selector matching.
   DESCRIPTION
   spec.homepage = "https://github.com/makenowjust/rexml-css_selector/"
   spec.license = "MIT"

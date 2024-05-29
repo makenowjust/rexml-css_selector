@@ -2,10 +2,16 @@
 
 require "bundler/gem_tasks"
 require "minitest/test_task"
+require "rdoc/task"
 require "rubocop/rake_task"
 require "syntax_tree/rake_tasks"
 
 Minitest::TestTask.create
+
+RDoc::Task.new do |t|
+  t.main = "README.md"
+  t.rdoc_files.include("README.md", "lib/**/*.rb")
+end
 
 RuboCop::RakeTask.new { |t| t.options = %w[--fail-level W] }
 

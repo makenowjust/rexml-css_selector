@@ -2,17 +2,18 @@
 
 module REXML
   module CSSSelector
+    # ParseError is an error on parsing.
     class ParseError < Error
       def initialize(message, pos)
         super("#{message} (at #{pos})")
       end
     end
 
+    # Parser is a CSS selector parser.
     class Parser
       def initialize(**config)
         @config = config
         @config[:pseudo_classes] ||= {}
-        @config[:pseudo_elements] ||= {}
       end
 
       def parse(source)
@@ -26,6 +27,8 @@ module REXML
 
       # See https://www.w3.org/TR/css-syntax-3/#token-diagrams and https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions.
 
+      # :stopdoc:
+
       RE_NEWLINE = /\r\n|[\n\r\f]/
       RE_WHITESPACE = /#{RE_NEWLINE}|[ \t]/
       RE_WS = /(?:#{RE_WHITESPACE})*/
@@ -36,9 +39,9 @@ module REXML
       RE_IDENT = /(?:-?(?:#{RE_IDENT_START})|--)(?:#{RE_IDENT_PART})*/
       RE_STRING =
         /
-        "(?:(?!#{RE_NEWLINE})[^"\\]|#{RE_ESCAPE_NEWLINE})*"
-      | '(?:(?!#{RE_NEWLINE})[^'\\]|#{RE_ESCAPE_NEWLINE})*'
-      /x
+          "(?:(?!#{RE_NEWLINE})[^"\\]|#{RE_ESCAPE_NEWLINE})*"
+        | '(?:(?!#{RE_NEWLINE})[^'\\]|#{RE_ESCAPE_NEWLINE})*'
+        /x
       RE_SUBSTITUTE = /\$#{RE_IDENT}/
       RE_VALUE = /#{RE_IDENT}|#{RE_STRING}|#{RE_SUBSTITUTE}/
 
@@ -316,10 +319,7 @@ module REXML
         return nil unless @scanner.scan(RE_PSEUDO_ELEMENT_SELECTOR)
 
         name = Parser.unescape_ident(@scanner[:name])
-
-        if @scanner.scan(RE_OPEN_PAREN)
-          argument = parse_function_argument(@config[:pseudo_elements][name]&.argument_kind)
-        end
+        argument = parse_function_argument(nil) if @scanner.scan(RE_OPEN_PAREN)
 
         pseudo_classes = []
         while (pseudo_class = try_parse_pseudo_class_selector)
@@ -423,6 +423,8 @@ module REXML
 
         raise ParseError.new("expected #{error_token}", @scanner.charpos)
       end
+
+      # :startdoc:
     end
   end
 end

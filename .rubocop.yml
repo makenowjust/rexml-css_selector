@@ -38,3 +38,11 @@ Metrics/PerceivedComplexity:
 
 Naming/MethodParameterName:
   Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/Documentation:
+  Exclude:
+    - lib/rexml/css_selector/queries/*.rb
+    - test/**/*.rb

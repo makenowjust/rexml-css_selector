@@ -6,18 +6,18 @@ require "strscan"
 
 module REXML
   module CSSSelector
+    # Error is a base class of errors in this library.
     class Error < ::StandardError
     end
   end
 end
-
-require_relative "css_selector/version"
 
 require_relative "css_selector/ast"
 require_relative "css_selector/base_adapter"
 require_relative "css_selector/parser"
 require_relative "css_selector/pseudo_class_def"
 require_relative "css_selector/query_context"
+require_relative "css_selector/version"
 
 require_relative "css_selector/adapters/rexml_adapter"
 
@@ -53,7 +53,9 @@ require_relative "css_selector/queries/universal_type_query"
 require_relative "css_selector/compiler"
 
 module REXML
+  # CSSSelector provides CSS selector matching for +REXML+.
   module CSSSelector
+    # DEFAULT_CONFIG is the default configuration value.
     DEFAULT_CONFIG = {
       pseudo_classes: {
         "first-child" => PseudoClassDef::FIRST_CHILD,
@@ -87,6 +89,9 @@ module REXML
       }.freeze
     }.freeze
 
+    # HTML_OPTIONS is a set of options.
+    #
+    # This value is used when <tt>html: true</tt> is specified.
     HTML_OPTIONS = {
       tag_name_case: :insensitive,
       attribute_name_case: :insensitive,
@@ -146,7 +151,7 @@ module REXML
       disabled_elements: [].freeze
     }.freeze
 
-    def self.setup_config(config)
+    def self.setup_config(config) # :nodoc:
       pseudo_classes = DEFAULT_CONFIG[:pseudo_classes]
       pseudo_classes = pseudo_classes.merge(config[:pseudo_classes]) if config[:pseudo_classes]
 
@@ -175,7 +180,7 @@ module REXML
       selector = Parser.new(pseudo_classes:).parse(selector)
       query = Compiler.new(pseudo_classes:).compile(selector)
       context = QueryContext.new(scope:, adapter:, substitutions:, options:)
-      adapter.each_recursive_node(scope) { |node| yield node if query.call(node, context) }
+      adapter.each_recursive_element(scope) { yield _1 if query.call(_1, context) }
       nil
     end
 
