@@ -2,12 +2,19 @@
 
 > A REXML extension for supporting CSS selector.
 
+[![GitHub Actions status](https://img.shields.io/github/actions/workflow/status/makenowjust/rexml-css_selector/main.yml?style=for-the-badge&logo=github)](https://github.com/makenowjust/rexml-css_selector/actions/workflows/main.yml)
+[![RubyGems version badge](https://img.shields.io/gem/v/rexml-css_selector?style=for-the-badge&logo=rubygems)](https://rubygems.org/gems/rexml-css_selector)
+
 ## Installation
 
-This library has not been published on RubyGems yet.
-
-You can use this library via GitHub source.
 Please add the following line to your `Gemfile`.
+
+```ruby
+gem 'rexml-css_selector'
+```
+
+Or, you can use this library via GitHub source.
+In this case, please add the following line to your `Gemfile`.
 
 ```ruby
 gem 'rexml-css_selector', :git => 'git://github.com/makenowjust/rexml-css_selector.git'
