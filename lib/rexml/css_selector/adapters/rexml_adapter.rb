@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module REXML # :nodoc:
+module REXML
   module CSSSelector
     module Adapters
       # REXMLAdapter is an adapter implementation for +REXML+.

@@ -9,7 +9,6 @@ module REXML
     #
     # - <tt>element?(node)</tt>
     # - <tt>get_tag_name(element)</tt>
-    # - <tt>get_namespace(element)</tt>
     # - <tt>get_attribute(element, name, namespace = nil, attribute_name_case = :sensitive)</tt>
     # - <tt>get_document_node(element)</tt>
     # - <tt>get_parent_node(element)</tt>
@@ -43,6 +42,11 @@ module REXML
       # This method is used for <tt>:disabled</tt>.
       def disabled?(element)
         !!get_attribute(element, "disabled")
+      end
+
+      # Returns a namespace of +element+.
+      def get_namespace(_element)
+        nil
       end
 
       # Returns an array of children elements of +element+.

@@ -17,7 +17,8 @@ RuboCop::RakeTask.new { |t| t.options = %w[--fail-level W] }
 
 [SyntaxTree::Rake::WriteTask, SyntaxTree::Rake::CheckTask].each do |task|
   task.new do |t|
-    t.source_files = FileList[%w[Gemfile Rakefile *.gemspec bin/**/{console,rake} lib/**/*.rb test/**/*.rb]]
+    t.source_files =
+      FileList[%w[Gemfile Rakefile *.gemspec bin/**/{console,rake} lib/**/*.rb test/**/*.rb example/**/*.rb]]
     t.print_width = 120
   end
 end
