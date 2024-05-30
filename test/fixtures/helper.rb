@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module Fixture
-  def self.load(filename) = REXML::Document.new(File.read("#{__dir__}/#{filename}"))
+  def self.filepath(filename) = "#{__dir__}/#{filename}"
+
+  def self.load(filename) = REXML::Document.new(File.read(filepath(filename)))
 
   def self.load_nwmatcher = load("nwmatcher.html")
   def self.load_qwery = load("qwery.html")

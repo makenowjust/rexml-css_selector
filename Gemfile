@@ -14,3 +14,9 @@ group :development do
   gem "rubocop-rake", "~> 0.6"
   gem "syntax_tree", "~> 6.2.0"
 end
+
+group :tool do
+  gem "benchmark", "~> 0.3.0"
+  gem "nokogiri", "~> 1.16.5"
+  gem "stackprof", "~> 0.2.26"
+end
