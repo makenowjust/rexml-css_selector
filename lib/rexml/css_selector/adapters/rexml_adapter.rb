@@ -35,7 +35,10 @@ module REXML
 
           case attribute_name_case
           in :sensitive
-            element.attribute(name, namespace)&.value
+            attrs = element.attributes
+            # NOTE: `REXML::Element.attribute` is too slow to use.
+            # Therefore, we call `REXML::Attributes#[]` instead.
+            namespace.nil? ? attrs[name] : attrs.get_attribute_ns(namespace, name)&.value
           in :insensitive
             name = name.downcase(:ascii)
             target_attr = nil
@@ -65,9 +68,8 @@ module REXML
           element.each_child { yield _1 if element?(_1) }
         end
 
-        def each_recursive_element(element, &)
-          element.each_recursive(&)
-        end
+        # NOTE: `REXML::Element#each_recursive` is too slow.
+        # Therefore, we use our default implementation instead.
 
         # INSTANCE is the default instance.
         INSTANCE = new

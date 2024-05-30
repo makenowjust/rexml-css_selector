@@ -78,9 +78,13 @@ module REXML
 
       # Enumerates the elements in +element+
       def each_recursive_element(element, &)
-        each_child_element(element) do |child|
+        stack = []
+        each_child_element(element) { stack.unshift _1 }
+        until stack.empty?
+          child = stack.pop
           yield child
-          each_recursive_element(child, &)
+          n = stack.size
+          each_child_element(child) { stack.insert n, _1 }
         end
       end
     end
