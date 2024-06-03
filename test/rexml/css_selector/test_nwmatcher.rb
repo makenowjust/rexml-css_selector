@@ -18,7 +18,7 @@ module REXML
 
       def test_universal
         elements = []
-        @document.each_recursive { |element| elements << element if element.is_a?(REXML::Element) }
+        @document.each_recursive { |element| elements << element if element.is_a?(::REXML::Element) }
 
         assert_equal elements, select_all("*")
       end
@@ -26,7 +26,7 @@ module REXML
       def test_element
         elements = []
         @document.each_recursive do |element|
-          elements << element if element.is_a?(REXML::Element) && element.name == "li"
+          elements << element if element.is_a?(::REXML::Element) && element.name == "li"
         end
 
         assert_equal elements, select_all("li")

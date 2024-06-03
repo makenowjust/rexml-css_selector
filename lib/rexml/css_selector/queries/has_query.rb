@@ -17,7 +17,7 @@ module REXML
             base = context.adapter.get_parent_node(base) if @needs_parent
             context
               .adapter
-              .each_recursive_node(base) do |child|
+              .each_recursive_element(base) do |child|
                 next if node == child
                 if @query.call(child, context)
                   matched = true

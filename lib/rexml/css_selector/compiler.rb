@@ -262,7 +262,7 @@ module REXML
           namespace = namespace_name(namespace)
           Queries::AttributeMatcherQuery.new(cont:, name:, namespace:, matcher:, value:, modifier:)
         in PseudoClass[name:] => pseudo_class
-          pseudo_class_def = @config[:pseudo_classes][name]
+          pseudo_class_def = @config[:pseudo_classes][name.downcase(:ascii)]
           raise CompileError, "undefined pseudo class ':#{name}'" unless pseudo_class_def
           pseudo_class_def.compile(cont, pseudo_class, self)
         end

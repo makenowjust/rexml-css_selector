@@ -45,11 +45,17 @@ module REXML
           in :"|="
             /(?:^|\|)#{value}(?:$|[|-])/.match?(actual) && @cont.call(node, context)
           in :"^="
-            actual.start_with?(value) && @cont.call(node, context)
+            # From https://www.w3.org/TR/selectors-3/#attribute-substrings.
+            # > If "val" is the empty string then the selector does not represent anything.
+            !value.empty? && actual.start_with?(value) && @cont.call(node, context)
           in :"$="
-            actual.end_with?(value) && @cont.call(node, context)
+            # From https://www.w3.org/TR/selectors-3/#attribute-substrings.
+            # > If "val" is the empty string then the selector does not represent anything.
+            !value.empty? && actual.end_with?(value) && @cont.call(node, context)
           in :"*="
-            actual.include?(value) && @cont.call(node, context)
+            # From https://www.w3.org/TR/selectors-3/#attribute-substrings.
+            # > If "val" is the empty string then the selector does not represent anything.
+            !value.empty? && actual.include?(value) && @cont.call(node, context)
           end
         end
       end

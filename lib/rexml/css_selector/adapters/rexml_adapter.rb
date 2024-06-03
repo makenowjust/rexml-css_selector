@@ -65,6 +65,7 @@ module REXML
         end
 
         def each_child_element(element, &)
+          return unless element.is_a?(::REXML::Element)
           element.each_child { yield _1 if element?(_1) }
         end
 

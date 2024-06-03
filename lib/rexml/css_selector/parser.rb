@@ -52,7 +52,7 @@ module REXML
           if escape[1] =~ /\H/
             escape[1]
           else
-            escape[1..].to_i(16).chr
+            escape[1..].to_i(16).chr(escape.encoding)
           end
         end
       end
@@ -66,7 +66,7 @@ module REXML
               elsif escape[1] =~ /\H/
                 escape[1]
               else
-                escape[1..].to_i(16).chr
+                escape[1..].to_i(16).chr(escape.encoding)
               end
             end
           String[value]
@@ -172,7 +172,7 @@ module REXML
         RelativeSelector[combinator:, right: selector]
       end
 
-      RE_COMBINATOR = /#{RE_WS}(?:[>+~]|\|\|)#{RE_WS}|(?:#{RE_WHITESPACE})+(?![,)])/
+      RE_COMBINATOR = /#{RE_WS}(?:[>+~]|\|\|)#{RE_WS}|(?:#{RE_WHITESPACE})+(?![,)]|\z)/
 
       def try_parse_combinator
         return nil unless @scanner.scan(RE_COMBINATOR)
@@ -309,7 +309,8 @@ module REXML
         name = Parser.unescape_ident(@scanner[:name])
 
         if @scanner.scan(RE_OPEN_PAREN)
-          argument = parse_function_argument(@config[:pseudo_classes][name]&.argument_kind)
+          normalized_name = name.downcase(:ascii)
+          argument = parse_function_argument(@config[:pseudo_classes][normalized_name]&.argument_kind)
         end
 
         PseudoClass[name:, argument:]
@@ -357,7 +358,14 @@ module REXML
         end
       end
 
-      RE_NTH = /odd\b|even\b|(?:(?<a>[+-]?\d+|[+-]?)n)?(?<b>(?:(?:[+-]|(?<!n)[+-]?)\d+)?)/
+      RE_NTH =
+        /
+        odd\b
+      | even\b
+      |
+        (?:(?<a>[+-]?\d+|[+-]?)n)?
+           (?<b>(?:(?:#{RE_WS}[+-]|(?<!n)#{RE_WS}[+-]?)#{RE_WS}\d+)?)
+      /x
 
       def parse_nth
         scan! RE_NTH, '"odd", "even", or An+B'
@@ -380,13 +388,8 @@ module REXML
             else
               @scanner[:a].to_i
             end
-          b =
-            case @scanner[:b]
-            when ""
-              0
-            else
-              @scanner[:b].to_i
-            end
+          b = @scanner[:b].gsub(RE_WS, "")
+          b = b.empty? ? 0 : b.to_i
           Nth[a:, b:]
         end
       end

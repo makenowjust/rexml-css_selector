@@ -2,7 +2,11 @@
 module Fixture
   def self.filepath(filename) = "#{__dir__}/#{filename}"
 
-  def self.load(filename) = REXML::Document.new(File.read(filepath(filename)))
+  def self.load(filename)
+    @cache ||= {}
+    content = @cache[filename] ||= File.read(filepath(filename))
+    REXML::Document.new(content)
+  end
 
   def self.load_nwmatcher = load("nwmatcher.html")
   def self.load_qwery = load("qwery.html")
@@ -24,6 +28,7 @@ module Fixture
     end
 
     def ids(*ids, document: @document)
+      return [] if ids.empty?
       condition = ids.map { |id| "@id=\"#{id}\"" }.join(" or ")
       elements = []
       document.each_element("//*[#{condition}]") { |element| elements << element }

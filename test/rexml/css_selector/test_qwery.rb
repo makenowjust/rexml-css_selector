@@ -13,7 +13,7 @@ module REXML
 
       def setup
         @document = Fixture.load_qwery
-        @small_document = REXML::Document.new(<<~HTML)
+        @small_document = ::REXML::Document.new(<<~HTML)
           <root>
             <div id="hsoob">
               <div class="a b">
@@ -28,7 +28,7 @@ module REXML
             <div id="lonelyHsoob"></div>
           </root>
           HTML
-        @fragment = REXML::Document.new(<<~HTML).root
+        @fragment = ::REXML::Document.new(<<~HTML).root
           <root>
             <div class="d i v">
               <p id="oooo"><em></em><em id="emem"></em></p>
