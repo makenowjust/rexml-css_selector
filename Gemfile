@@ -16,7 +16,8 @@ group :development do
 end
 
 group :tool do
-  gem "benchmark", "~> 0.3.0"
+  gem "benchmark_driver", "~> 0.16.5"
   gem "nokogiri", "~> 1.16.5"
+  gem "optparse", "~> 0.4.0"
   gem "stackprof", "~> 0.2.26"
 end

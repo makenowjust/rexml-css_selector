@@ -1,4 +1,8 @@
+#!/usr/bin/env ruby
+
 # frozen_string_literal: true
+
+require "bundler/setup"
 
 require "optparse"
 require "rexml/document"
@@ -9,7 +13,7 @@ require_relative "../test/fixtures/helper"
 
 filepath = Fixture.filepath("sizzle.html")
 selector = "h2, #qunit-fixture p"
-out = "tmp/stack-prof-cpu-profile-#{Time.now.strftime("%Y%m%d%H%M%S")}.dump"
+out = "tmp/profile-#{Time.now.strftime("%Y%m%d%H%M%S")}.dump"
 n = 1000
 
 opt = OptionParser.new
@@ -45,3 +49,8 @@ end
 
 puts
 puts "==> Finish a profile"
+
+puts
+puts "==> Generate flamegraph HTML"
+
+File.open("#{out}.html", "w") { |f| StackProf::Report.from_file(out).print_d3_flamegraph(f) }
