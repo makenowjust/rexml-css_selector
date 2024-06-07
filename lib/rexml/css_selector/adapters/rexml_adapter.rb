@@ -71,6 +71,8 @@ module REXML
 
         # NOTE: `REXML::Element#each_recursive` is too slow.
         # Therefore, we use our default implementation instead.
+        # TODO: Now, this problem is solved in https://github.com/ruby/rexml/pull/139.
+        # We will switch to the REXML implementation when it is released.
 
         # INSTANCE is the default instance.
         INSTANCE = new
